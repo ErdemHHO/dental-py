@@ -7,7 +7,6 @@ import io
 
 app = FastAPI()
 
-# Modeli yükleyin
 model = tf.keras.models.load_model('dental_model.h5')
 
 def predict_image(image: Image.Image):
@@ -17,7 +16,6 @@ def predict_image(image: Image.Image):
     image_array = np.array(image) / 255.0
     image_array = np.expand_dims(image_array, axis=0)
 
-    # Tahmin yapın
     predictions = model.predict(image_array)
     return {
         "caries": float(predictions[0][0]),
@@ -28,7 +26,6 @@ def predict_image(image: Image.Image):
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):
     try:
-        # Görüntüyü yükleyin
         image = Image.open(io.BytesIO(await file.read()))
         prediction = predict_image(image)
         return JSONResponse(content=prediction)
